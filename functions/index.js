@@ -11,7 +11,6 @@ exports.getRelevantNaics = onRequest(
     cors(req, res, async () => {
       try {
         const userDescription = req.body.userDescription || "";
-        const sizeThreshold = parseInt(req.body.sizeThreshold) || 0;
         
         if (!userDescription) {
           return res.status(400).json({ error: "Missing userDescription" });
@@ -20,20 +19,18 @@ exports.getRelevantNaics = onRequest(
         const openai = new OpenAI({ apiKey: openAIKey.value() });
 
         const prompt = `
-          User request: "${userDescription}"
-          ${sizeThreshold > 0 ? 
-            `Targeting companies with more than ${sizeThreshold} employees. ` : 
-            ''}
-          Identify the 2-digit NAICS codes for industries that:
-          1. Match the business description
-          2. Typically contain companies ${sizeThreshold > 0 ? `with over ${sizeThreshold} employees` : 'of all sizes'}
+          ${userDescription.includes(' ') ? 
+            `Business description: "${userDescription}"` : 
+            `Company name: "${userDescription}"`}
+
+          Identify the 2-digit NAICS codes for industries that this business or company may sell into (e.g., Microsoft would sell into practically all industries). Please provide an exhaustive list.
           
           Provide only the numeric codes as comma-separated values (e.g., "54, 62").
           No explanations or additional text.
         `;
 
         const response = await openai.chat.completions.create({
-          model: "gpt-4",
+          model: "gpt-4o",
           messages: [{ role: "user", content: prompt }],
           max_tokens: 50,
           temperature: 0,
@@ -48,11 +45,8 @@ exports.getRelevantNaics = onRequest(
         return res.status(200).json({
           relevantTwoDigitCodes: twoDigitCodes
         });
-      } catch (err) {
-        console.error("API Error:", err);
-        return res.status(500).json({ 
-          error: err.message.includes("401") ? "Invalid OpenAI key" : err.message 
-        });
+      } catch (error) {
+        return res.status(500).json({ error: error.message });
       }
     });
   }
