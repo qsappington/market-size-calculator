@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import Papa from 'papaparse';
 import './styles/naicsExporter.css';
 
+// Add this mapping at the top of the file, outside the component
+const HYPHENATED_NAICS_MAPPINGS = {
+  '31': '31-33', // Manufacturing
+  '32': '31-33',
+  '33': '31-33',
+  '44': '44-45', // Retail Trade
+  '45': '44-45',
+  '48': '48-49', // Transportation and Warehousing
+  '49': '48-49'
+};
+
 function NaicsExporter() {
   const [userDescription, setUserDescription] = useState('');
   const [sizeThreshold, setSizeThreshold] = useState(0);
@@ -47,23 +58,32 @@ function NaicsExporter() {
       setCsvData(csvData);
 
       // Step 3: Filter and aggregate results
-      const codeSet = new Set(relevantCodes.map(code => code.trim()));
+      const codeSet = new Set(relevantCodes.map(code => {
+        const trimmedCode = code.trim();
+        // Check if this code is part of a hyphenated group
+        return HYPHENATED_NAICS_MAPPINGS[trimmedCode] || trimmedCode;
+      }));
+
       const aggregated = csvData.reduce((acc, row) => {
         const naicsCode = (row.naics_code || '').trim();
-        // Only process rows where naics_code is exactly 2 digits
-        if (naicsCode.length !== 2) return acc;
+        
+        // Skip if not a 2-digit code and not a hyphenated code
+        if (naicsCode.length !== 2 && !naicsCode.includes('-')) return acc;
+        
+        // For 2-digit codes, check if they're part of a hyphenated group
+        const effectiveCode = HYPHENATED_NAICS_MAPPINGS[naicsCode] || naicsCode;
         
         const firmSize = parseFirmSize(row.firm_size || '');
         
-        if (codeSet.has(naicsCode) && firmSize >= sizeThreshold) {
-          if (!acc[naicsCode]) {
-            acc[naicsCode] = {
-              code: naicsCode,
+        if (codeSet.has(effectiveCode) && firmSize >= sizeThreshold) {
+          if (!acc[effectiveCode]) {
+            acc[effectiveCode] = {
+              code: effectiveCode,
               description: row.industry_description || 'N/A',
               totalFirms: 0
             };
           }
-          acc[naicsCode].totalFirms += parseInt(row.number_of_firms) || 0;
+          acc[effectiveCode].totalFirms += parseInt(row.number_of_firms) || 0;
         }
         return acc;
       }, {});
@@ -107,8 +127,11 @@ function NaicsExporter() {
     <div className="naics-container">
       <div className="sidebar">
         <h1 className="naics-title">Total Addressable Market Calculator</h1>
+        <p className="naics-subtitle">
+          For B2B companies: Calculate how many potential business customers exist in the U.S. market based on industry and company size.
+        </p>
         <p className="input-description">
-          Enter a company name or describe the business to calculate the total number of addressable firms.
+          Enter your company name or describe what type of businesses you sell to.
         </p>
         
         <div className="input-wrapper">
@@ -121,7 +144,7 @@ function NaicsExporter() {
           />
         </div>
         
-        <label className="filter-label">Minimum company size:</label>
+        <label className="filter-label">Minimum customer size:</label>
         <div className="select-wrapper">
           <select 
             className="size-select"
@@ -129,9 +152,9 @@ function NaicsExporter() {
             onChange={(e) => setSizeThreshold(Number(e.target.value))}
           >
             <option value={0}>No minimum</option>
-            <option value={20}>20+ employees</option>
-            <option value={100}>100+ employees</option>
-            <option value={500}>500+ employees</option>
+            <option value={20}>20 employees</option>
+            <option value={100}>100 employees</option>
+            <option value={500}>500 employees</option>
           </select>
         </div>
 

@@ -182,3 +182,17 @@
     text-align: center;
   }
   
+  .naics-subtitle {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+    font-style: italic;
+  }
+  
+  /* Dropdown options will be black */
+  .size-select option {
+    background-color: white;
+    color: #000000;
+  }
+  
