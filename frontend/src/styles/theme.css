@@ -1,0 +1,10 @@
+:root {
+    --primary-color: #2563eb;
+    --background-color: #f8fafc;
+    --text-color: #1e293b;
+    --border-color: #e2e8f0;
+    --success-color: #16a34a;
+    --error-color: #dc2626;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+    --rounded-md: 6px;
+  }

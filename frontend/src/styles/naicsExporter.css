@@ -1,0 +1,66 @@
+.app-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+  }
+  
+  .input-section {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--rounded-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+  }
+  
+  .description-input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--rounded-md);
+    margin-bottom: 1.5rem;
+    resize: vertical;
+  }
+  
+  .filters {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .size-select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--rounded-md);
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .results-section {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--rounded-md);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  
+  .results-table th,
+  .results-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .results-table th {
+    background-color: var(--background-color);
+    font-weight: 600;
+  }
